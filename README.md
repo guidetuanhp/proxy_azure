@@ -25,7 +25,7 @@ Copy and paste the following script into your Azure Cloud Shell. Be sure to modi
 region="canadacentral"                        
 admin_user="your_username"
 admin_pass="Your_password@123"
-image="Canonical:UbuntuServer:18.04-LTS:latest"
+image="Canonical:ubuntu-24_04-lts:server:latest"
 vm_size="Standard_B1s"
 
 # === Proxy Auth Config ===
