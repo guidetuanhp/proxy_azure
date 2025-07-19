@@ -22,21 +22,21 @@ Copy and paste the following script into your Azure Cloud Shell. Be sure to modi
 #!/bin/bash
 
 # === CONFIG ===
-region="canadacentral"                        
-admin_user="your_username"
-admin_pass="Your_password@123"
+region="your location"                        
+admin_user="your username"
+admin_pass="your password virtual"
 image="Canonical:ubuntu-24_04-lts:server:latest"
 vm_size="Standard_B1s"
 
 # === Proxy Auth Config ===
-proxy_user="your_proxy_username"
-proxy_pass="your_proxy_password"
+proxy_user="your ip username"
+proxy_pass="Your ip password"
 
 # === AUTO-GENERATED NAMES ===
-number=$RANDOM
-vmgroup="mygroup${number}0"
-vmname="myname${number}0"
-public_ip="myip${number}0"
+RANDOM_ID=$(openssl rand -hex 3)
+vmgroup="mygroup${RANDOM_ID}"
+vmname="myname${RANDOM_ID}"
+public_ip="myip${RANDOM_ID}"
 
 # === CREATE RESOURCE GROUP ===
 az group create --name $vmgroup --location $region
@@ -45,13 +45,15 @@ az group create --name $vmgroup --location $region
 az vm create \
     --resource-group $vmgroup \
     --name $vmname \
-    --public-ip-address $public_ip \
     --image $image \
     --size $vm_size \
     --admin-username $admin_user \
     --admin-password $admin_pass \
     --authentication-type all \
-    --generate-ssh-keys
+    --generate-ssh-keys \
+    --assign-identity \
+    --public-ip-sku Standard \
+    --public-ip-address-dns-name $public_ip
 
 # === OPEN ALL PORTS ===
 az vm open-port --ids $(az vm list -g $vmgroup --query "[].id" -o tsv) --port '*'
@@ -76,7 +78,7 @@ az vm run-command invoke \
     /etc/init.d/3proxyinit start
   "
 
-# === OUTPUT PUBLIC IP ===
+# === GET PUBLIC IP ===
 public_ip=$(az vm show -d -g $vmgroup -n $vmname --query publicIps -o tsv)
 
 # === PRINT RESULT ===
